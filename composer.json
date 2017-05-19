@@ -1,0 +1,22 @@
+{
+  "name": "popo1h/support",
+  "description": "popo1h's support",
+  "type": "library",
+  "keywords": [
+  ],
+  "license": "Apache-2.0",
+  "authors": [
+    {
+      "name": "popo1h",
+      "email": "popo1h@sina.com"
+    }
+  ],
+  "require": {
+    "php": ">=5.5.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Popo1h\\Support\\": "src/"
+    }
+  }
+}
