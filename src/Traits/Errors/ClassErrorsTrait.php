@@ -1,45 +1,45 @@
 <?php
 
-namespace Popo1h\Support\Traits;
+namespace Popo1h\Support\Traits\Errors;
 
-trait ClassErrors
+trait ClassErrorsTrait
 {
     /**
      * 最近一次错误码
      * @var mixed
      */
-    protected $_errorCode;
+    protected $_classErrorErrorCode;
 
     /**
      * 最近一次错误信息
      * @var string
      */
-    protected $_errorInfo;
+    protected $_classErrorErrorInfo;
 
     /**
      * 错误信息数组
      * @var array
      */
-    protected $_errors;
+    protected $_classErrorErrors;
 
     /**
      * 默认错误信息
      * @var string
      */
-    protected $_defaultSuccessInfo = '操作成功';
+    protected $_classErrorDefaultSuccessInfo = '操作成功';
 
     /**
      * 默认错误信息
      * @var string
      */
-    protected $_defaultErrorInfo = '操作失败';
+    protected $_classErrorDefaultErrorInfo = '操作失败';
 
     /**
      * 初始化错误信息
      */
     protected function initErrors()
     {
-        $this->_errors = [];
+        $this->_classErrorErrors = [];
     }
 
     /**
@@ -47,8 +47,8 @@ trait ClassErrors
      */
     public function clearError()
     {
-        $this->_errorCode = null;
-        $this->_errorInfo = null;
+        $this->_classErrorErrorCode = null;
+        $this->_classErrorErrorInfo = null;
     }
 
     /**
@@ -58,11 +58,11 @@ trait ClassErrors
      */
     protected function setError($errorCode, $errorInfo = null)
     {
-        $this->_errorCode = [
+        $this->_classErrorErrorCode = [
             'class' => $this,
             'code' => $errorCode,
         ];
-        $this->_errorInfo = $errorInfo;
+        $this->_classErrorErrorInfo = $errorInfo;
     }
 
     /**
@@ -82,7 +82,7 @@ trait ClassErrors
      */
     public function getRawErrorCode()
     {
-        return $this->_errorCode;
+        return $this->_classErrorErrorCode;
     }
 
     public function getErrorCode()
@@ -132,7 +132,7 @@ trait ClassErrors
      */
     public function getRawErrorInfo()
     {
-        return $this->_errorInfo;
+        return $this->_classErrorErrorInfo;
     }
 
     /**
@@ -143,17 +143,17 @@ trait ClassErrors
     public function getErrorInfoByCode($errorCode)
     {
         if ($this->checkError() == false) {
-            return $this->_defaultSuccessInfo;
+            return $this->_classErrorDefaultSuccessInfo;
         }
 
-        if (!isset($this->_errors)) {
+        if (!isset($this->_classErrorErrors)) {
             $this->initErrors();
         }
 
-        if (isset($this->_errors[$errorCode])) {
-            return $this->_errors[$errorCode];
+        if (isset($this->_classErrorErrors[$errorCode])) {
+            return $this->_classErrorErrors[$errorCode];
         } else {
-            return $this->_defaultErrorInfo;
+            return $this->_classErrorDefaultErrorInfo;
         }
     }
 
@@ -170,7 +170,7 @@ trait ClassErrors
             $errorCodeArr = $this->getErrorCodeAndClass();
 
             if (!isset($errorCodeArr['code'])) {
-                return $this->_defaultSuccessInfo;
+                return $this->_classErrorDefaultSuccessInfo;
             }
             return call_user_func([$errorCodeArr['class'], 'getErrorInfoByCode'], $errorCodeArr['code']);
         }

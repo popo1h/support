@@ -1,8 +1,8 @@
 <?php
 
-namespace Popo1h\Support\Traits;
+namespace Popo1h\Support\Traits\Instances;
 
-trait Singleton
+trait SingletonTrait
 {
     public static function getInstance()
     {

@@ -1,11 +1,16 @@
 <?php
 
-namespace Popo1h\Support\Traits;
+namespace Popo1h\Support\Traits\Instances;
 
-trait InstancePool
+trait InstancePoolTrait
 {
-    protected static $_instancePool;
+    protected static $_instancePool = [];
     protected static $_instancePoolDefaultKey = 'default';
+
+    protected static function createInstance()
+    {
+        return null;
+    }
 
     public static function getInstanceFromPool($key = null, $autoCreate = true)
     {
@@ -18,10 +23,7 @@ trait InstancePool
                 return null;
             }
 
-            static::$_instancePool[$key] = new static();
-            if (is_callable([static::$_instancePool[$key], '_initialize'])) {
-                call_user_func([static::$_instancePool[$key], '_initialize']);
-            }
+            static::$_instancePool[$key] = static::createInstance();
         }
 
         return static::$_instancePool[$key];
@@ -32,7 +34,7 @@ trait InstancePool
         static::$_instancePoolDefaultKey = $key;
     }
 
-    public function pushInstanceIntoPool($key = null, $setAsDefault = true)
+    public static function pushInstanceIntoPool($instance, $key = null, $setAsDefault = true)
     {
         if (!isset($key)) {
             $key = static::$_instancePoolDefaultKey;
@@ -40,6 +42,6 @@ trait InstancePool
             static::setInstancePoolDefaultKey($key);
         }
 
-        static::$_instancePool[$key] = $this;
+        static::$_instancePool[$key] = $instance;
     }
 }
