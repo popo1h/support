@@ -39,6 +39,9 @@ trait StringPackTrait
         return [];
     }
 
+    /**
+     * @return string
+     */
     public function packToString()
     {
         $packArr = [];
@@ -51,11 +54,18 @@ trait StringPackTrait
         return static::stringPackPack($packArr);
     }
 
+    /**
+     * @param string $string
+     * @return static
+     */
     public static function unpackString($string)
     {
         $packArr = static::stringPackUnpack($string);
 
         $reflectionClass = new \ReflectionClass(static::class);
+        /**
+         * @var static $instance
+         */
         $instance = $reflectionClass->newInstanceWithoutConstructor();
 
         $propertyNames = static::getPackPropertyNames();
