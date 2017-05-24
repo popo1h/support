@@ -4,44 +4,35 @@ namespace Popo1h\Support\Traits\Instances;
 
 trait InstancePoolTrait
 {
-    protected static $_instancePool = [];
-    protected static $_instancePoolDefaultKey = 'default';
+    protected $_instancePool = [];
+    protected $_instancePoolDefaultKey = 'default';
 
-    protected static function createInstance()
-    {
-        return null;
-    }
-
-    public static function getInstanceFromPool($key = null, $autoCreate = true)
+    public function getInstanceFromPool($key = null)
     {
         if (!isset($key)) {
-            $key = static::$_instancePoolDefaultKey;
+            $key = $this->_instancePoolDefaultKey;
         }
 
-        if (!isset(static::$_instancePool[$key])) {
-            if (!$autoCreate) {
-                return null;
-            }
-
-            static::$_instancePool[$key] = static::createInstance();
+        if (!isset($this->_instancePool[$key])) {
+            return null;
         }
 
-        return static::$_instancePool[$key];
+        return $this->_instancePool[$key];
     }
 
-    public static function setInstancePoolDefaultKey($key)
+    public function setInstancePoolDefaultKey($key)
     {
-        static::$_instancePoolDefaultKey = $key;
+        $this->_instancePoolDefaultKey = $key;
     }
 
-    public static function pushInstanceIntoPool($instance, $key = null, $setAsDefault = true)
+    public function pushInstanceIntoPool($instance, $key = null, $setAsDefault = true)
     {
         if (!isset($key)) {
-            $key = static::$_instancePoolDefaultKey;
+            $key = $this->_instancePoolDefaultKey;
         } elseif ($setAsDefault) {
-            static::setInstancePoolDefaultKey($key);
+            $this->setInstancePoolDefaultKey($key);
         }
 
-        static::$_instancePool[$key] = $instance;
+        $this->_instancePool[$key] = $instance;
     }
 }
