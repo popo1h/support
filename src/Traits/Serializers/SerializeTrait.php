@@ -5,14 +5,14 @@ namespace Popo1h\Support\Traits\Serizlizers;
 trait SerializeTrait
 {
     /**
-     * @return array [ 'attribute name',... ]
+     * @return array [ 'property name',... ]
      */
-    abstract protected function getSerializeValMap();
+    abstract protected function getSerializePropertyNames();
 
     public function serialize()
     {
         $arr = [];
-        foreach ($this->getSerializeValMap() as $item) {
+        foreach ($this->getSerializePropertyNames() as $item) {
             $arr[$item] = $this->$item;
         }
 
@@ -23,7 +23,7 @@ trait SerializeTrait
     {
         $arr = unserialize($serialized);
 
-        foreach ($this->getSerializeValMap() as $item) {
+        foreach ($this->getSerializePropertyNames() as $item) {
             $this->$item = $arr[$item];
         }
     }
