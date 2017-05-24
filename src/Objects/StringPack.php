@@ -42,6 +42,9 @@ class StringPack
             case self::PACK_DATA_TYPE_STRING_PACK:
                 $content = forward_static_call_array([$className, 'unpackString'], [$content]);
                 break;
+            case self::PACK_DATA_TYPE_OTHER:
+                $content = unserialize($content);
+                break;
         }
 
         return $content;

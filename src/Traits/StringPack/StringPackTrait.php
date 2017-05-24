@@ -2,6 +2,8 @@
 
 namespace Popo1h\Support\Traits\StringPack;
 
+use Popo1h\Support\Objects\StringPack;
+
 trait StringPackTrait
 {
     protected static function getUnpackObjectInitMethodName()
@@ -47,7 +49,7 @@ trait StringPackTrait
         $packArr = [];
         foreach (static::getPackPropertyNames() as $propertyName) {
             if (isset($this->$propertyName)) {
-                $packArr[$propertyName] = $this->$propertyName;
+                $packArr[$propertyName] = StringPack::pack($this->$propertyName);
             }
         }
 
@@ -73,7 +75,7 @@ trait StringPackTrait
             if (isset($packArr[$propertyName]) && $reflectionClass->hasProperty($propertyName)) {
                 $property = $reflectionClass->getProperty($propertyName);
                 $property->setAccessible(true);
-                $property->setValue($instance, $packArr[$propertyName]);
+                $property->setValue($instance, StringPack::unpack($packArr[$propertyName]));
             }
         }
 
