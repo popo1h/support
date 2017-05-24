@@ -11,7 +11,7 @@ interface StringPackInterface
 
     /**
      * @param string $string
-     * @return object
+     * @return static
      */
     public static function unpackString($string);
 }
