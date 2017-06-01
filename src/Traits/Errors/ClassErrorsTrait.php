@@ -106,7 +106,7 @@ trait ClassErrorsTrait
         return $errorCode;
     }
 
-    protected function getErrorCodeAndClass()
+    public function getErrorCodeAndClass()
     {
         $rawErrorCode = $this->getRawErrorCode();
 
