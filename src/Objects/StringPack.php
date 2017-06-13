@@ -40,14 +40,14 @@ class StringPack
     {
         $unpackData = explode(self::PACK_DATA_DELIMITER, $packedData, 3);
         if(count($unpackData) < 3){
-            throw (new PackedDataErrorException());
+            throw (new PackedDataErrorException($packedData));
         }
         list($type, $className, $content) = $unpackData;
 
         switch ($type) {
             case self::PACK_DATA_TYPE_STRING_PACK:
                 if(!is_callable([$className, 'unpackString'])){
-                    throw (new PackedDataErrorException());
+                    throw (new PackedDataErrorException($packedData));
                 }
                 $content = forward_static_call_array([$className, 'unpackString'], [$content]);
                 break;

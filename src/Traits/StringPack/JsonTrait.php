@@ -17,7 +17,7 @@ trait JsonTrait
     {
         $arr = json_decode($packedString, true);
         if (json_last_error() != JSON_ERROR_NONE) {
-            throw (new PackedDataErrorException());
+            throw (new PackedDataErrorException($packedString));
         }
 
         return $arr;

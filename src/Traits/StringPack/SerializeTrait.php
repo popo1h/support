@@ -19,7 +19,7 @@ trait SerializeTrait
             return unserialize($packedString);
         }
         catch (\Exception $e){
-            throw (new PackedDataErrorException());
+            throw (new PackedDataErrorException($packedString));
         }
     }
 }
