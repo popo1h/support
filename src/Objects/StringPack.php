@@ -3,6 +3,7 @@
 namespace Popo1h\Support\Objects;
 
 use Popo1h\Support\Interfaces\StringPackInterface;
+use Popo1h\Support\Exceptions\StringPack\PackedDataErrorException;
 
 class StringPack
 {
@@ -33,13 +34,21 @@ class StringPack
     /**
      * @param string $packedData
      * @return mixed
+     * @throws PackedDataErrorException
      */
     public static function unpack($packedData)
     {
-        list($type, $className, $content) = explode(self::PACK_DATA_DELIMITER, $packedData, 3);
+        $unpackData = explode(self::PACK_DATA_DELIMITER, $packedData, 3);
+        if(count($unpackData) < 3){
+            throw (new PackedDataErrorException());
+        }
+        list($type, $className, $content) = $unpackData;
 
         switch ($type) {
             case self::PACK_DATA_TYPE_STRING_PACK:
+                if(!is_callable([$className, 'unpackString'])){
+                    throw (new PackedDataErrorException());
+                }
                 $content = forward_static_call_array([$className, 'unpackString'], [$content]);
                 break;
             case self::PACK_DATA_TYPE_OTHER:

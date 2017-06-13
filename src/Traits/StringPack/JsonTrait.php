@@ -2,6 +2,8 @@
 
 namespace Popo1h\Support\Traits\StringPack;
 
+use Popo1h\Support\Exceptions\StringPack\PackedDataErrorException;
+
 trait JsonTrait
 {
     use StringPackTrait;
@@ -13,6 +15,11 @@ trait JsonTrait
 
     protected static function stringPackUnpack($packedString)
     {
-        return json_decode($packedString, true);
+        $arr = json_decode($packedString, true);
+        if (json_last_error() != JSON_ERROR_NONE) {
+            throw (new PackedDataErrorException());
+        }
+
+        return $arr;
     }
 }

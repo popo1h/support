@@ -2,6 +2,8 @@
 
 namespace Popo1h\Support\Traits\StringPack;
 
+use Popo1h\Support\Exceptions\StringPack\PackedDataErrorException;
+
 trait SerializeTrait
 {
     use StringPackTrait;
@@ -13,6 +15,11 @@ trait SerializeTrait
 
     protected static function stringPackUnpack($packedString)
     {
-        return unserialize($packedString);
+        try {
+            return unserialize($packedString);
+        }
+        catch (\Exception $e){
+            throw (new PackedDataErrorException());
+        }
     }
 }
