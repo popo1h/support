@@ -54,6 +54,8 @@ class StringPack
             case self::PACK_DATA_TYPE_OTHER:
                 $content = unserialize($content);
                 break;
+            default:
+                throw (new PackedDataErrorException($packedData));
         }
 
         return $content;
