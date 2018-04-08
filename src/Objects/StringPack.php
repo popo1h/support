@@ -12,12 +12,14 @@ class StringPack
     const PACK_DATA_TYPE_STRING_PACK = '1';
     const PACK_DATA_TYPE_ARRAY = '2';
     const PACK_DATA_TYPE_OTHER = '0';
+    const PACK_DATA_TYPE_COMPRESS = '99';
 
     /**
      * @param mixed $unpackData
+     * @param bool $compress
      * @return string
      */
-    public static function pack($unpackData)
+    public static function pack($unpackData, $compress = false)
     {
         if ($unpackData instanceof StringPackInterface) {
             $type = self::PACK_DATA_TYPE_STRING_PACK;
@@ -26,18 +28,25 @@ class StringPack
         } elseif (is_array($unpackData)) {
             $type = self::PACK_DATA_TYPE_ARRAY;
             $className = 'array';
-            $packedDataArr = [];
+            $packedDataItems = [];
             foreach ($unpackData as $key => $unpackDataItem) {
-                $packedDataArr[$key] = static::pack($unpackDataItem);
+                $packedDataItems[$key] = self::pack($unpackDataItem);
             }
-            $content = json_encode($packedDataArr);
+            $content = json_encode($packedDataItems);
         } else {
             $type = self::PACK_DATA_TYPE_OTHER;
             $className = '';
             $content = serialize($unpackData);
         }
 
-        return $type . self::PACK_DATA_DELIMITER . $className . self::PACK_DATA_DELIMITER . $content;
+        $packedData = $type . self::PACK_DATA_DELIMITER . $className . self::PACK_DATA_DELIMITER . $content;
+
+        if ($compress) {
+            $compressStr = base64_encode(gzcompress($packedData));
+            $packedData = self::PACK_DATA_TYPE_COMPRESS . self::PACK_DATA_DELIMITER . '' . self::PACK_DATA_DELIMITER . $compressStr;
+        }
+
+        return $packedData;
     }
 
     /**
@@ -63,11 +72,15 @@ class StringPack
             case self::PACK_DATA_TYPE_ARRAY:
                 $unpackData = [];
                 foreach (json_decode($content) as $key => $packedDataItem) {
-                    $unpackData[$key] = static::unpack($packedDataItem);
+                    $unpackData[$key] = self::unpack($packedDataItem);
                 }
                 break;
             case self::PACK_DATA_TYPE_OTHER:
                 $unpackData = unserialize($content);
+                break;
+            case self::PACK_DATA_TYPE_COMPRESS:
+                $unCompressPackedData = gzuncompress(base64_decode($content));
+                $unpackData = self::unpack($unCompressPackedData);
                 break;
             default:
                 throw (new PackedDataErrorException($packedData));
