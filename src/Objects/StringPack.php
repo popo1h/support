@@ -26,15 +26,11 @@ class StringPack
         } elseif (is_array($unpackData)) {
             $type = self::PACK_DATA_TYPE_ARRAY;
             $className = 'array';
-            $packedArrDataStr = '';
-            foreach ($unpackData as $unpackDataItem) {
-                if ($packedArrDataStr) {
-                    $packedArrDataStr .= self::PACK_DATA_DELIMITER;
-                }
-                $packedArrDataItemStr = static::pack($unpackDataItem);
-                $packedArrDataStr .= strlen($packedArrDataItemStr) . self::PACK_DATA_DELIMITER . $packedArrDataItemStr;
+            $packedDataArr = [];
+            foreach ($unpackData as $key => $unpackDataItem) {
+                $packedDataArr[$key] = static::pack($unpackDataItem);
             }
-            $content = count($unpackData) . self::PACK_DATA_DELIMITER . $packedArrDataStr;
+            $content = json_encode($packedDataArr);
         } else {
             $type = self::PACK_DATA_TYPE_OTHER;
             $className = '';
@@ -51,52 +47,32 @@ class StringPack
      */
     public static function unpack($packedData)
     {
-        $unpackData = explode(self::PACK_DATA_DELIMITER, $packedData, 3);
-        if (count($unpackData) < 3) {
+        $tempArr = explode(self::PACK_DATA_DELIMITER, $packedData, 3);
+        if (count($tempArr) < 3) {
             throw (new PackedDataErrorException($packedData));
         }
-        list($type, $className, $content) = $unpackData;
+        list($type, $className, $content) = $tempArr;
 
         switch ($type) {
             case self::PACK_DATA_TYPE_STRING_PACK:
                 if (!is_callable([$className, 'unpackString'])) {
                     throw (new PackedDataErrorException($packedData));
                 }
-                $content = forward_static_call_array([$className, 'unpackString'], [$content]);
+                $unpackData = forward_static_call_array([$className, 'unpackString'], [$content]);
                 break;
             case self::PACK_DATA_TYPE_ARRAY:
-                $content = [];
-                $unpackArrData = explode(self::PACK_DATA_DELIMITER, $content, 2);
-                if (count($unpackArrData) < 2) {
-                    throw (new PackedDataErrorException($packedData));
-                }
-                list($arrCount, $packedArrDataStr) = $unpackArrData;
-                $delimiterLength = strlen(self::PACK_DATA_DELIMITER);
-                $dealArrDataItemLength = 0;
-                $packedArrDataLength = strlen($packedArrDataStr);
-                $restPackedArrDataStr = $packedArrDataStr;
-                for ($i = 0; $i < $arrCount; $i++) {
-                    $tempDataItem = explode(self::PACK_DATA_DELIMITER, $restPackedArrDataStr, 2);
-                    if (count($tempDataItem) < 2) {
-                        throw (new PackedDataErrorException($packedData));
-                    }
-                    list($packedArrDataItemLength, $restPackedArrDataStr) = $tempDataItem;
-                    $dealArrDataItemLength += $packedArrDataItemLength + $delimiterLength;
-                    if ($dealArrDataItemLength > $packedArrDataLength) {
-                        throw (new PackedDataErrorException($packedData));
-                    }
-                    $packedArrDataItemStr = substr($restPackedArrDataStr, 0, $packedArrDataItemLength);
-                    $content[] = static::unpack($packedArrDataItemStr);
-                    $restPackedArrDataStr = substr($restPackedArrDataStr, $packedArrDataItemLength);
+                $unpackData = [];
+                foreach (json_decode($content) as $key => $packedDataItem) {
+                    $unpackData[$key] = static::unpack($packedDataItem);
                 }
                 break;
             case self::PACK_DATA_TYPE_OTHER:
-                $content = unserialize($content);
+                $unpackData = unserialize($content);
                 break;
             default:
                 throw (new PackedDataErrorException($packedData));
         }
 
-        return $content;
+        return $unpackData;
     }
 }

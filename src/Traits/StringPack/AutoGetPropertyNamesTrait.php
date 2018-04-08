@@ -6,12 +6,26 @@ trait AutoGetPropertyNamesTrait
 {
     protected static function getPackPropertyNames()
     {
-        $reflectionClass = new \ReflectionClass(static::class);
+        $funcGetPropertyNames = function (\ReflectionClass $reflectionClass) use (&$funcGetPropertyNames) {
+            $propertyNames = [];
 
-        $propertyNames = [];
-        foreach ($reflectionClass->getProperties() as $property) {
-            $propertyNames[] = $property->getName();
-        }
-        return $propertyNames;
+            foreach ($reflectionClass->getProperties() as $property) {
+                $propertyName = $property->getName();
+                if (isset($hasSetPropertyNames[$propertyName])) {
+                    continue;
+                }
+                $propertyNames[] = $propertyName;
+            }
+
+            $parentReflectionClass = $reflectionClass->getParentClass();
+            if ($parentReflectionClass) {
+                $propertyNames['--parent'] = $funcGetPropertyNames($parentReflectionClass);
+            }
+
+            return $propertyNames;
+        };
+
+        $reflectionClass = new \ReflectionClass(static::class);
+        return $funcGetPropertyNames($reflectionClass);
     }
 }
