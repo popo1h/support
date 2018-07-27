@@ -30,6 +30,7 @@ class CommentHelper
     /**
      * @param string|object $class
      * @return static
+     * @throws \ReflectionException
      */
     public static function createByClass($class)
     {
@@ -43,6 +44,7 @@ class CommentHelper
      * @param string|object $class
      * @param string $method
      * @return static
+     * @throws \ReflectionException
      */
     public static function createByMethod($class, $method)
     {
@@ -55,6 +57,7 @@ class CommentHelper
     /**
      * @param string $function
      * @return static
+     * @throws \ReflectionException
      */
     public static function createByFunction($function)
     {
