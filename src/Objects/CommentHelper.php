@@ -5,6 +5,20 @@ namespace Popo1h\Support\Objects;
 class CommentHelper
 {
     /**
+     * 跨行注释(无法匹配中间包含*的注释)
+     */
+    const COMMENT_MATCH_TYPE_MULTI_LINE = 1;
+    /**
+     * 单行注释
+     */
+    const COMMENT_MATCH_TYPE_SINGLE_LINE = 2;
+
+    /**
+     * @var int
+     */
+    protected $commentMatchType;
+
+    /**
      * @var string
      */
     protected $rawComment;
@@ -21,50 +35,55 @@ class CommentHelper
 
     /**
      * @param string $comment
+     * @param int $commentMatchType
      */
-    public function __construct($comment)
+    public function __construct($comment, $commentMatchType = self::COMMENT_MATCH_TYPE_MULTI_LINE)
     {
         $this->rawComment = $comment;
+        $this->commentMatchType = $commentMatchType;
     }
 
     /**
      * @param string|object $class
+     * @param int $commentMatchType
      * @return static
      * @throws \ReflectionException
      */
-    public static function createByClass($class)
+    public static function createByClass($class, $commentMatchType = self::COMMENT_MATCH_TYPE_MULTI_LINE)
     {
         $reflectionClass = new \ReflectionClass($class);
         $comment = $reflectionClass->getDocComment();
 
-        return new static($comment);
+        return new static($comment, $commentMatchType);
     }
 
     /**
      * @param string|object $class
      * @param string $method
+     * @param int $commentMatchType
      * @return static
      * @throws \ReflectionException
      */
-    public static function createByMethod($class, $method)
+    public static function createByMethod($class, $method, $commentMatchType = self::COMMENT_MATCH_TYPE_MULTI_LINE)
     {
         $reflectionMethod = new \ReflectionMethod($class, $method);
         $comment = $reflectionMethod->getDocComment();
 
-        return new static($comment);
+        return new static($comment, $commentMatchType);
     }
 
     /**
      * @param string $function
+     * @param int $commentMatchType
      * @return static
      * @throws \ReflectionException
      */
-    public static function createByFunction($function)
+    public static function createByFunction($function, $commentMatchType = self::COMMENT_MATCH_TYPE_MULTI_LINE)
     {
         $reflectionFunction = new \ReflectionFunction($function);
         $comment = $reflectionFunction->getDocComment();
 
-        return new static($comment);
+        return new static($comment, $commentMatchType);
     }
 
     /**
@@ -73,8 +92,16 @@ class CommentHelper
     protected function getCommentList()
     {
         if (!isset($this->commentLines)) {
-            preg_match_all('/\* ([^*]*?)$/ims', $this->rawComment, $commentMatchRes);
-            $this->commentLines = $commentMatchRes[1];
+            $rawComment = str_replace('*\/', '*/', $this->rawComment);
+            switch($this->commentMatchType){
+                case self::COMMENT_MATCH_TYPE_MULTI_LINE:
+                    preg_match_all('/\* ([^*]*?)$/ims', $rawComment, $commentMatchRes);
+                    $this->commentLines = $commentMatchRes[1];
+                    break;
+                default:
+                    preg_match_all('/\* (.*?)$/im', $rawComment, $commentMatchRes);
+                    $this->commentLines = $commentMatchRes[1];
+            }
         }
 
         return $this->commentLines;
